@@ -18,14 +18,19 @@ def upload_to_azure(blob_service_client, container_name, blob_name, data_stream,
             print(f"Blob {blob_name} already exists in container {container_name}")
         else:
             print(f"An error occurred: {e}")
-        
 
 # Azure Download from Blob Storage
 def download_from_azure(blob_service_client, container_name, blob_name, file_name):
     try:
-        container_client = blob_service_client.get_container_client(
-            container_name)
+        container_client = blob_service_client.get_container_client(container_name)
         blob_client = container_client.get_blob_client(blob_name)
+        # Check if the blob is directory-like. If it is, ensure the directory exists locally.
+        if blob_name.endswith('/'):
+            if not os.path.exists(file_name):
+                os.makedirs(file_name)
+            return
+        elif os.path.isdir(file_name):
+            file_name += "_file"
         with open(file_name, "wb") as download_file:
             download_file.write(blob_client.download_blob().readall())
         print(f"Downloaded {blob_name} from Azure to {file_name}")
