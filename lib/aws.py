@@ -29,4 +29,4 @@ def download_from_s3(s3_client, bucket_name, key, file_name):
         s3_client.download_file(bucket_name, key, file_name)
         print(f"Downloaded {key} from S3 to {file_name}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred when downloading {key}: {e}")
