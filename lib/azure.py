@@ -43,18 +43,20 @@ def transfer_s3_to_azure(s3_client, blob_service_client, bucket_name, container_
         result = s3_client.list_objects_v2(Bucket=bucket_name)
         if result.get('Contents'):
             for item in result['Contents']:
-                print(item['Key'])
+                try:
+                    print(f"Transferring {item['Key']} from S3 to Azure Blob Storage")
 
-                # Get object from S3 as a streaming response
-                s3_object = s3_client.get_object(
-                    Bucket=bucket_name, Key=item['Key'])
-                data_stream = s3_object['Body']
+                    # Get object from S3 as a streaming response
+                    s3_object = s3_client.get_object(Bucket=bucket_name, Key=item['Key'])
+                    data_stream = s3_object['Body']
 
-                # Transfer the data to Azure Blob Storage
-                # If the file exists, a 
-                upload_to_azure(blob_service_client,
-                                container_name, item['Key'], data_stream)
+                    # Transfer the data to Azure Blob Storage
+                    upload_to_azure(blob_service_client, container_name, item['Key'], data_stream)
+
+                except Exception as e:
+                    print(f"Failed to transfer {item['Key']}: {e}")
+
         else:
             print(f"No objects in bucket {bucket_name}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred while listing objects in the bucket: {e}")
