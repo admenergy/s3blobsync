@@ -4,8 +4,16 @@ from lib.aws import *
 from config import *
 
 def read_processed_files_list(filepath):
-    """ Read the processed files list and return a set of tuples with file name and size. """
+    #Read or create the processed files list and return a set of tuples with file name and size.
     processed_files = set()
+    
+    # Check if file exists, if not, create it with a header
+    if not os.path.isfile(filepath):
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Filename', 'File Size'])
+
     with open(filepath, mode='r', newline='') as file:
         reader = csv.reader(file)
         next(reader, None)  # Skip the header

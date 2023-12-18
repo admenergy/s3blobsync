@@ -33,11 +33,12 @@ To set up S3BlobSync, you need to configure your AWS and Azure credentials. Use 
 
 - `boto3`: For AWS operations.
 - `azure-storage-blob`: For Azure blob storage operations.
+- `tqdm`: For Download Progress Bars
 
 Install the dependencies using:
 
 ```bash
-pip install boto3 azure-storage-blob
+pip install boto3 azure-storage-blob tqdm
 ```
 
 ## Contributing
