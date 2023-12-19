@@ -25,21 +25,43 @@ def upload_to_azure(blob_service_client, container_name, blob_name, data, block_
 # Azure Download from Blob Storage
 def download_from_azure(blob_service_client, container_name, blob_name, file_name):
     try:
-        container_client = blob_service_client.get_container_client(
-            container_name)
+        container_client = blob_service_client.get_container_client(container_name)
         blob_client = container_client.get_blob_client(blob_name)
-        # Check if the blob is directory-like. If it is, ensure the directory exists locally.
+
+        # Check if the blob is directory-like.
         if blob_name.endswith('/'):
             if not os.path.exists(file_name):
                 os.makedirs(file_name)
             return
         elif os.path.isdir(file_name):
             file_name += "_file"
-        with open(file_name, "wb") as download_file:
-            download_file.write(blob_client.download_blob().readall())
-        print(f"Downloaded {blob_name} from Azure to {file_name}")
+
+        blob_properties = blob_client.get_blob_properties()
+        file_size = blob_properties.size
+
+        # Check if the local file exists and has the same size
+        if os.path.exists(file_name):
+            local_file_size = os.path.getsize(file_name)
+            if local_file_size == file_size:
+                print(f"File {file_name} already exists with the same size, skipping download.")
+                return
+
+        with open(file_name, "wb") as download_file, tqdm(total=file_size, unit='B', unit_scale=True, desc=file_name) as progress_bar:
+            # Download the blob in chunks
+            stream = blob_client.download_blob()
+            chunk_size = 1024 * 1024 * 10  # 10 MB chunks
+            read_size = 0  # Track the amount of data read
+
+            while read_size < file_size:
+                data = stream.read(chunk_size)
+                download_file.write(data)
+                read_size += len(data)
+                progress_bar.update(len(data))
+
+        # print(f"Downloaded {blob_name} from Azure to {file_name}")
     except Exception as e:
         print(f"An error occurred: {e}")
+
 # Azure Transfer from S3 to Blob Storage
 def transfer_s3_to_azure(s3_client, blob_service_client, bucket_name, container_name, chunk_size=10*1024*1024):  # 10 MB chunk size
     try:

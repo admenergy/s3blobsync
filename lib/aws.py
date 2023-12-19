@@ -1,3 +1,4 @@
+import os
 import boto3
 from tqdm import tqdm
 
@@ -29,9 +30,13 @@ def download_from_s3(s3_client, bucket_name, key, file_name):
     try:
         response = s3_client.head_object(Bucket=bucket_name, Key=key)
         file_size = response['ContentLength']
-
+        if os.path.exists(file_name):
+            local_file_size = os.path.getsize(file_name)
+            if local_file_size == file_size:
+                print(f"File {file_name} already exists with the same size, skipping download.")
+                return
+            
         with tqdm(total=file_size, unit='B', unit_scale=True, desc=file_name) as progress_bar:
             s3_client.download_file(bucket_name, key, file_name, Callback=lambda bytes_transferred: progress_bar.update(bytes_transferred))
-        print(f"Downloaded {key} from S3 to {file_name}")
     except Exception as e:
         print(f"An error occurred when downloading {key}: {e}")

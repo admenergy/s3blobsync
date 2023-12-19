@@ -6,7 +6,7 @@ from os import path
 import fnmatch
 
 def read_processed_files_list(filepath):
-    """ Read the processed files list and return a set of tuples with file name and size. """
+    #Read the processed files list and return a set of tuples with file name and size.
     processed_files = set()
     with open(filepath, mode='r', newline='') as file:
         reader = csv.reader(file)
@@ -62,8 +62,8 @@ def main():
         is_directory_placeholder = any(b.startswith(blob_name + '/') for b in blob_list if b != blob_name)
 
         if blob_name.endswith('/') or is_directory_placeholder:
-            print(f"Processing directory-like blob: {blob_name}")
-            print(f"Local directory to be created: {download_path}")
+            # print(f"Processing directory-like blob: {blob_name}")
+            # print(f"Local directory to be created: {download_path}")
             if not os.path.exists(download_path):
                 os.makedirs(download_path)
             continue
@@ -78,8 +78,8 @@ def main():
             print(f"Skipping file not matching patterns: {blob_name}")
             continue
 
-        print(f"Processing file blob: {blob_name}")
-        print(f"Local file path for download: {download_path}")
+        # print(f"Processing file blob: {blob_name}")
+        # print(f"Local file path for download: {download_path}")
 
         # Ensure the directory structure exists before downloading
         directory = os.path.dirname(download_path)
