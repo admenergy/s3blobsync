@@ -2,27 +2,31 @@ import os
 from azure.storage.blob import BlobServiceClient
 from azure.core.exceptions import ResourceNotFoundError
 from azure.core.exceptions import ResourceExistsError
+from azure.storage.blob import BlobBlock
 import base64
 import hashlib
+import uuid
+from tqdm import tqdm
+
 
 # Azure Upload to Blob Storage
-def upload_to_azure(blob_service_client, container_name, blob_name, data_stream, overwrite=False):
-    try: 
-        container_client = blob_service_client.get_container_client(container_name)
+def upload_to_azure(blob_service_client, container_name, blob_name, data, block_id):
+    try:
+        container_client = blob_service_client.get_container_client(
+            container_name)
         blob_client = container_client.get_blob_client(blob_name)
-        blob_client.upload_blob(data_stream)
-        print(f"Uploaded {blob_name} to Azure Blob storage")
+
+        # Upload the data as a block
+        blob_client.stage_block(block_id, data)
+        # print(f"Uploaded block {block_id} to Azure Blob storage: {blob_name}")
     except Exception as e:
-        # If it exists already print that exception out cleanly in a single line, otherwise, paste the whole error
-        if isinstance(e, ResourceExistsError):
-            print(f"Blob {blob_name} already exists in container {container_name}")
-        else:
-            print(f"An error occurred: {e}")
+        print(f"An error occurred during upload: {e}")
 
 # Azure Download from Blob Storage
 def download_from_azure(blob_service_client, container_name, blob_name, file_name):
     try:
-        container_client = blob_service_client.get_container_client(container_name)
+        container_client = blob_service_client.get_container_client(
+            container_name)
         blob_client = container_client.get_blob_client(blob_name)
         # Check if the blob is directory-like. If it is, ensure the directory exists locally.
         if blob_name.endswith('/'):
@@ -36,22 +40,51 @@ def download_from_azure(blob_service_client, container_name, blob_name, file_nam
         print(f"Downloaded {blob_name} from Azure to {file_name}")
     except Exception as e:
         print(f"An error occurred: {e}")
-
 # Azure Transfer from S3 to Blob Storage
-def transfer_s3_to_azure(s3_client, blob_service_client, bucket_name, container_name):
+def transfer_s3_to_azure(s3_client, blob_service_client, bucket_name, container_name, chunk_size=10*1024*1024):  # 10 MB chunk size
     try:
         result = s3_client.list_objects_v2(Bucket=bucket_name)
         if result.get('Contents'):
             for item in result['Contents']:
                 try:
-                    print(f"Transferring {item['Key']} from S3 to Azure Blob Storage")
+                    # Check if the file already exists on Azure
+                    container_client = blob_service_client.get_container_client(
+                        container_name)
+                    blob_client = container_client.get_blob_client(item['Key'])
+
+                    if blob_client.exists():
+                        properties = blob_client.get_blob_properties()
+                        s3_object = s3_client.head_object(
+                            Bucket=bucket_name, Key=item['Key'])
+                        if properties.size == s3_object['ContentLength']:
+                            print(
+                                f"File {item['Key']} already exists on Azure with the same size, skipping.")
+                            continue
 
                     # Get object from S3 as a streaming response
-                    s3_object = s3_client.get_object(Bucket=bucket_name, Key=item['Key'])
+                    s3_object = s3_client.get_object(
+                        Bucket=bucket_name, Key=item['Key'])
                     data_stream = s3_object['Body']
+                    file_size = s3_object['ContentLength']
 
-                    # Transfer the data to Azure Blob Storage
-                    upload_to_azure(blob_service_client, container_name, item['Key'], data_stream)
+                    # Create a progress bar and upload in chunks
+                    with tqdm(total=file_size, unit='B', unit_scale=True, desc=item['Key']) as progress_bar:
+                        block_list = []
+                        for i in range(0, file_size, chunk_size):
+                            block_id = base64.b64encode(
+                                uuid.uuid4().bytes).decode('utf-8')
+                            chunk = data_stream.read(chunk_size)
+                            progress_bar.update(len(chunk))
+
+                            upload_to_azure(
+                                blob_service_client, container_name, item['Key'], chunk, block_id)
+                            block_list.append(BlobBlock(block_id))
+
+                        # Commit the block list to finalize the blob
+                        if block_list:
+                            blob_client.commit_block_list(block_list)
+                            print(
+                                f"Successfully uploaded {item['Key']} to Azure Blob Storage.")
 
                 except Exception as e:
                     print(f"Failed to transfer {item['Key']}: {e}")

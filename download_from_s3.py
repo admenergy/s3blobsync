@@ -58,7 +58,6 @@ def main():
                     os.makedirs(directory)
 
                 download_from_s3(s3_client, S3_BUCKET, key, download_path)
-                print(f"Downloaded {key} from S3 to {download_path}")
 
             # Write the object details to the inventory file
             writer.writerow([os.path.basename(key), download_path, size, storage_class])
