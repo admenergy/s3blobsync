@@ -1,4 +1,5 @@
 import os
+import time
 from azure.storage.blob import BlobServiceClient
 from azure.core.exceptions import ResourceNotFoundError
 from azure.core.exceptions import ResourceExistsError
@@ -43,10 +44,11 @@ def download_from_azure(blob_service_client, container_name, blob_name, file_nam
         if os.path.exists(file_name):
             local_file_size = os.path.getsize(file_name)
             if local_file_size == file_size:
-                print(f"File {file_name} already exists with the same size, skipping download.")
+                print(f"Skipping {file_name}, already exists with the same size.")
                 return
 
-        with open(file_name, "wb") as download_file, tqdm(total=file_size, unit='B', unit_scale=True, desc=file_name) as progress_bar:
+        start_time = time.time()
+        with open(file_name, "wb") as download_file, tqdm(total=file_size, unit='B', unit_scale=True, desc=file_name, leave=False) as progress_bar:
             # Download the blob in chunks
             stream = blob_client.download_blob()
             chunk_size = 1024 * 1024 * 10  # 10 MB chunks
@@ -57,8 +59,22 @@ def download_from_azure(blob_service_client, container_name, blob_name, file_nam
                 download_file.write(data)
                 read_size += len(data)
                 progress_bar.update(len(data))
+                
+        # Retrieve information from tqdm
+        elapsed_time = time.time() - start_time
+        rate = progress_bar.format_dict['rate']
 
-        # print(f"Downloaded {blob_name} from Azure to {file_name}")
+        # Calculate rate in MB/s
+        rate = file_size / elapsed_time / 1024 / 1024
+        rate_str = f"{rate:.2f} MB/s"
+
+        # Format elapsed time as minutes:seconds
+        mins, secs = divmod(int(elapsed_time), 60)
+        duration_str = f"{mins}:{secs:02d}"
+
+        # Print the completion message with just the file name
+        print(f"Downloaded {os.path.basename(file_name)} | {file_size/1024/1024:.0f} MB, {duration_str}, {rate_str}")
+
     except Exception as e:
         print(f"An error occurred: {e}")
 

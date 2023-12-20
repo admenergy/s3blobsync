@@ -10,3 +10,9 @@ EXTERNAL_ID = 'YOUR_EXTERNAL_ID'
 # Azure Creds
 AZURE_CONNECTION_STRING = "YOUR_AZURE_CONNECTION_STRING"
 AZURE_CONTAINER_NAME = "YOUR_AZURE_CONTAINER_NAME"
+
+# Local download path
+LOCAL_DOWNLOAD_PATH = "downloads"
+PROCESSED_FILES_LIST_PATH = "inventory/processed_files_list.csv"
+INVENTORY_LIST_PATH = "inventory/s3_inventory.csv"
+AZURE_LIST_PATH = "inventory/azure_inventory.csv"

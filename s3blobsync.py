@@ -1,5 +1,5 @@
-from lib.aws import *
-from lib.azure import *
+from lib.s3 import *
+from lib.blob import *
 from config import *
 
 def main():

@@ -1,12 +1,11 @@
 # S3BlobSync
 
-**S3BlobSync** provides a seamless way to operate between two of the major cloud platforms: AWS and Azure. With a focus on data transfer and synchronization, this tool simplifies cloud operations, making it easier for developers and administrators to manage their resources across different platforms.
+**S3BlobSync** provides a seamless way to operate between two of the major cloud platforms: AWS S3 and Azure Blob Storage. With a focus on data transfer and synchronization, this tool simplifies cloud operations, making it easier for developers and administrators to manage their resources across different platforms.
 
 ## Features
 
-- **AWS Role Assumption**: Assume different AWS roles for secure operations.
 - **Data Download**: Easily download data from Azure or AWS S3.
-- **Data Transfer**: Transfer data seamlessly from AWS S3 to Azure.
+- **Data Transfer**: Transfer data seamlessly from AWS S3 to Azure Blob.
 
 ## Configuration
 
