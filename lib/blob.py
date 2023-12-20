@@ -105,8 +105,10 @@ def transfer_s3_to_azure(s3_client, blob_service_client, bucket_name, container_
                     data_stream = s3_object['Body']
                     file_size = s3_object['ContentLength']
 
+
+                    start_time = time.time()
                     # Create a progress bar and upload in chunks
-                    with tqdm(total=file_size, unit='B', unit_scale=True, desc=item['Key']) as progress_bar:
+                    with tqdm(total=file_size, unit='B', unit_scale=True, desc=item['Key'], leave=False) as progress_bar:
                         block_list = []
                         for i in range(0, file_size, chunk_size):
                             block_id = base64.b64encode(
@@ -121,8 +123,21 @@ def transfer_s3_to_azure(s3_client, blob_service_client, bucket_name, container_
                         # Commit the block list to finalize the blob
                         if block_list:
                             blob_client.commit_block_list(block_list)
-                            print(
-                                f"Successfully uploaded {item['Key']} to Azure Blob Storage.")
+
+                    # Retrieve information from tqdm
+                    elapsed_time = time.time() - start_time
+                    rate = progress_bar.format_dict['rate']
+
+                    # Calculate rate in MB/s
+                    rate = file_size / elapsed_time / 1024 / 1024
+                    rate_str = f"{rate:.2f} MB/s"
+
+                    # Format elapsed time as minutes:seconds
+                    mins, secs = divmod(int(elapsed_time), 60)
+                    duration_str = f"{mins}:{secs:02d}"
+
+                    # Print the completion message with just the file name
+                    print(f"Uploaded {item['Key']} to Azure Blob Storage | {file_size/1024/1024:.0f} MB, {duration_str}, {rate_str}")
 
                 except Exception as e:
                     print(f"Failed to transfer {item['Key']}: {e}")
