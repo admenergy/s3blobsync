@@ -1,3 +1,4 @@
+import fnmatch
 import os
 import time
 from azure.storage.blob import BlobServiceClient
@@ -5,10 +6,9 @@ from azure.core.exceptions import ResourceNotFoundError
 from azure.core.exceptions import ResourceExistsError
 from azure.storage.blob import BlobBlock
 import base64
-import hashlib
 import uuid
 from tqdm import tqdm
-
+from lib.common import *
 
 # Azure Upload to Blob Storage
 def upload_to_azure(blob_service_client, container_name, blob_name, data, block_id):
@@ -24,37 +24,49 @@ def upload_to_azure(blob_service_client, container_name, blob_name, data, block_
         print(f"An error occurred during upload: {e}")
 
 # Azure Download from Blob Storage
-def download_from_azure(blob_service_client, container_name, blob_name, file_name):
+def download_from_azure(blob_service_client, container_name, blob_name, download_path, valid_patterns=None):
     try:
         container_client = blob_service_client.get_container_client(container_name)
         blob_client = container_client.get_blob_client(blob_name)
+        blob_properties = blob_client.get_blob_properties()
+        blob_size = blob_properties.size
+
+        # Check if the blob has been processed already
+        if (os.path.basename(blob_name), blob_size) in read_processed_files_list(os.getenv('PROCESSED_FILES_LIST_PATH')):
+            print(f"Skipping {blob_name}, already processed")
+            return
+
+        # If valid patterns is defined, check if the blob matches any of the patterns
+        if valid_patterns and not any(fnmatch.fnmatch(blob_name, pattern) for pattern in valid_patterns):
+            print(f"Skipping {blob_name}, not matching filename patterns")
+            return
+
+        # Check if the local file exists and has the same size
+        if os.path.exists(download_path):
+            local_file_size = os.path.getsize(download_path)
+            if local_file_size == blob_size:
+                print(f"Skipping {blob_name}, already exists with the same size.")
+                return
 
         # Check if the blob is directory-like.
         if blob_name.endswith('/'):
-            if not os.path.exists(file_name):
-                os.makedirs(file_name)
+            if not os.path.exists(download_path):
+                os.makedirs(download_path)
             return
-        elif os.path.isdir(file_name):
-            file_name += "_file"
-
-        blob_properties = blob_client.get_blob_properties()
-        file_size = blob_properties.size
-
-        # Check if the local file exists and has the same size
-        if os.path.exists(file_name):
-            local_file_size = os.path.getsize(file_name)
-            if local_file_size == file_size:
-                print(f"Skipping {file_name}, already exists with the same size.")
-                return
+        
+        # Ensure the directory structure exists before downloading
+        directory = os.path.dirname(download_path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
 
         start_time = time.time()
-        with open(file_name, "wb") as download_file, tqdm(total=file_size, unit='B', unit_scale=True, desc=file_name, leave=False) as progress_bar:
+        with open(download_path, "wb") as download_file, tqdm(total=blob_size, unit='B', unit_scale=True, desc=os.path.basename(download_path), leave=False) as progress_bar:
             # Download the blob in chunks
             stream = blob_client.download_blob()
             chunk_size = 1024 * 1024 * 10  # 10 MB chunks
             read_size = 0  # Track the amount of data read
 
-            while read_size < file_size:
+            while read_size < blob_size:
                 data = stream.read(chunk_size)
                 download_file.write(data)
                 read_size += len(data)
@@ -65,7 +77,7 @@ def download_from_azure(blob_service_client, container_name, blob_name, file_nam
         rate = progress_bar.format_dict['rate']
 
         # Calculate rate in MB/s
-        rate = file_size / elapsed_time / 1024 / 1024
+        rate = blob_size / elapsed_time / 1024 / 1024
         rate_str = f"{rate:.2f} MB/s"
 
         # Format elapsed time as minutes:seconds
@@ -73,7 +85,7 @@ def download_from_azure(blob_service_client, container_name, blob_name, file_nam
         duration_str = f"{mins}:{secs:02d}"
 
         # Print the completion message with just the file name
-        print(f"Downloaded {os.path.basename(file_name)} | {file_size/1024/1024:.0f} MB, {duration_str}, {rate_str}")
+        print(f"Downloaded {os.path.basename(download_path)} | {blob_size/1024/1024:.0f} MB, {duration_str}, {rate_str}")
 
     except Exception as e:
         print(f"An error occurred: {e}")
