@@ -31,12 +31,18 @@ def download_from_s3(s3_client, bucket_name, key, file_name):
     try:
         response = s3_client.head_object(Bucket=bucket_name, Key=key)
         file_size = response['ContentLength']
+        storage_class = response.get('StorageClass', 'STANDARD')
 
         if os.path.exists(file_name):
             local_file_size = os.path.getsize(file_name)
             if local_file_size == file_size:
                 print(f"Skipping {os.path.basename(file_name)}, already exists with the same size.")
                 return
+
+        # Check for S3 Glacier or restricted access
+        if storage_class == 'GLACIER' or storage_class == 'DEEP_ARCHIVE':
+            print(f"Skipping {os.path.basename(file_name)}, file is in Glacier storage.")
+            return
 
         start_time = time.time()
         with tqdm(total=file_size, unit='B', unit_scale=True, desc=file_name, leave=False) as progress_bar:

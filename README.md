@@ -9,7 +9,7 @@
 
 ## Configuration
 
-To set up S3BlobSync, you need to configure your AWS and Azure credentials. Use the `config.example.py` as a reference to create your `config.py`.
+To set up S3BlobSync, you need to configure your AWS and Azure credentials. Use the `.env.example` as a reference to create your `.env`.
 
 ## Usage
 
@@ -33,11 +33,12 @@ To set up S3BlobSync, you need to configure your AWS and Azure credentials. Use 
 - `boto3`: For AWS operations.
 - `azure-storage-blob`: For Azure blob storage operations.
 - `tqdm`: For Download Progress Bars
+- `python-dotenv`: Environment Variables
 
 Install the dependencies using:
 
 ```bash
-pip install boto3 azure-storage-blob tqdm
+pip install boto3 azure-storage-blob tqdm python-dotenv
 ```
 
 ## Contributing

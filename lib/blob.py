@@ -96,7 +96,7 @@ def transfer_s3_to_azure(s3_client, blob_service_client, bucket_name, container_
                             Bucket=bucket_name, Key=item['Key'])
                         if properties.size == s3_object['ContentLength']:
                             print(
-                                f"File {item['Key']} already exists on Azure with the same size, skipping.")
+                                f"Skipping {item['Key']}, already exists on Azure with the same size.")
                             continue
 
                     # Get object from S3 as a streaming response

@@ -1,45 +1,30 @@
 import csv
 import os
+from lib.common import *
 from lib.blob import *
-from config import *
 from os import path
 import fnmatch
-
-def read_processed_files_list(filepath):
-    # Read the processed files list and return a set of tuples with file name and size.
-    processed_files = set()
-    
-    try:
-        with open(filepath, mode='r', newline='') as file:
-            reader = csv.reader(file)
-            next(reader, None)  # Skip the header
-            for row in reader:
-                if len(row) >= 2:
-                    processed_files.add((row[0], int(row[1])))
-    except FileNotFoundError:
-        # If the file does not exist, return an empty set
-        return processed_files
-    
-    return processed_files
+from dotenv import load_dotenv
+load_dotenv()  # This loads the variables from .env into the environment
 
 def main():
     # Create a BlobServiceClient
-    blob_service_client = BlobServiceClient.from_connection_string(AZURE_CONNECTION_STRING)
+    blob_service_client = BlobServiceClient.from_connection_string(os.getenv('AZURE_CONNECTION_STRING'))
 
     # Ensure local download directory and inventory list directory exist
-    if not os.path.exists(LOCAL_DOWNLOAD_PATH):
-        os.makedirs(LOCAL_DOWNLOAD_PATH)
-    os.makedirs(os.path.dirname(AZURE_LIST_PATH), exist_ok=True)
+    if not os.path.exists(os.getenv('LOCAL_DOWNLOAD_PATH')):
+        os.makedirs(os.getenv('LOCAL_DOWNLOAD_PATH'))
+    os.makedirs(os.path.dirname(os.getenv('AZURE_LIST_PATH')), exist_ok=True)
 
     # Read the list of already processed files
-    processed_files = read_processed_files_list(PROCESSED_FILES_LIST_PATH)
+    processed_files = read_processed_files_list(os.getenv('PROCESSED_FILES_LIST_PATH'))
 
     # List and download blobs
-    container_client = blob_service_client.get_container_client(AZURE_CONTAINER_NAME)
+    container_client = blob_service_client.get_container_client(os.getenv('AZURE_CONTAINER_NAME'))
     blob_list = [blob.name for blob in container_client.list_blobs()]
 
     # Create the inventory file
-    with open(AZURE_LIST_PATH, mode='w', newline='') as file:
+    with open(os.getenv('AZURE_LIST_PATH'), mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['Filename', 'Filepath', 'File Size (Bytes)', 'Storage Class'])
 
@@ -54,7 +39,7 @@ def main():
 
             # Extract details
             size = blob_properties.size
-            download_path = os.path.join(LOCAL_DOWNLOAD_PATH, blob_name)
+            download_path = os.path.join(os.getenv('LOCAL_DOWNLOAD_PATH'), blob_name)
             storage_class = blob_properties.blob_tier
 
             # Write the blob details to the inventory file
@@ -69,7 +54,7 @@ def main():
         blob_properties = blob_client.get_blob_properties()
         blob_size = blob_properties.size
 
-        download_path = os.path.join(LOCAL_DOWNLOAD_PATH, blob_name)
+        download_path = os.path.join(os.getenv('LOCAL_DOWNLOAD_PATH'), blob_name)
 
         # Check if the blob has been processed already
         if (blob_name, blob_size) in processed_files:
@@ -96,7 +81,7 @@ def main():
         if directory and not os.path.exists(directory):
             os.makedirs(directory)
 
-        download_from_azure(blob_service_client, AZURE_CONTAINER_NAME, blob_name, download_path)
+        download_from_azure(blob_service_client, os.getenv('AZURE_CONTAINER_NAME'), blob_name, download_path)
 
 if __name__ == "__main__":
     main()
