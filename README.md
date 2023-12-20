@@ -28,6 +28,20 @@ To set up S3BlobSync, you need to configure your AWS and Azure credentials. Use 
    python3 download_from_azure.py
    ```
 
+## Advanced Usage
+
+You can use the `--patterns` argument to filter the files you want to download based on their names. This argument accepts a list of patterns. Files that match any of the patterns will be downloaded. 
+
+For example, to download all files that have names containing "foo", "bar", or "baz", and end with ".gz", you can run:
+
+```bash
+python3 download_blob.py --patterns *foo*.gz *bar*.gz *baz*.gz
+```
+
+The * character is a wildcard that matches any sequence of characters. So *foo*.gz will match any file name that contains "foo" and ends with ".gz".
+
+Note: The --patterns argument is available in download_blob.py.
+
 ## Dependencies
 
 - `boto3`: For AWS operations.

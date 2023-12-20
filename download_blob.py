@@ -6,7 +6,7 @@ from lib.blob import *
 from dotenv import load_dotenv
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Azure Blob Sync Script')
+    parser = argparse.ArgumentParser(description='Blob Sync Script')
     parser.add_argument('--patterns', nargs='*', help='List of filename patterns to match')
     return parser.parse_args()
 
