@@ -15,6 +15,9 @@ def read_processed_files_list(filepath):
     return processed_files
 
 def main():
+    # Load environment variables
+    load_dotenv()
+
     # Assume the role
     aws_credentials = assume_role(os.getenv('ROLE_ARN_TO_ASSUME'), os.getenv('EXTERNAL_ID'), os.getenv('AWS_ACCESS_KEY'), os.getenv('AWS_SECRET_KEY'))
 
