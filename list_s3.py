@@ -3,17 +3,6 @@ import os
 from lib.s3 import *
 from dotenv import load_dotenv
 
-def read_processed_files_list(filepath):
-    """ Read the processed files list and return a set of tuples with file name and size. """
-    processed_files = set()
-    with open(filepath, mode='r', newline='') as file:
-        reader = csv.reader(file)
-        next(reader, None)  # Skip the header
-        for row in reader:
-            if len(row) >= 2:
-                processed_files.add((row[0], int(row[1])))
-    return processed_files
-
 def main():
     # Load environment variables
     load_dotenv()
