@@ -1,8 +1,8 @@
 import argparse
 import csv
 import os
-from lib.common import *
-from lib.blob import *
+from .lib.common import *
+from .lib.blob import *
 from dotenv import load_dotenv
 
 def parse_args():
@@ -10,7 +10,7 @@ def parse_args():
     parser.add_argument('--patterns', nargs='*', help='List of filename patterns to match')
     return parser.parse_args()
 
-def main():
+def download_blob():
     # Parse command line arguments
     args = parse_args()
 
@@ -59,4 +59,4 @@ def main():
             download_from_azure(blob_service_client, os.getenv('AZURE_CONTAINER_NAME'), blob_name, download_path, valid_patterns=valid_patterns)
 
 if __name__ == "__main__":
-    main()
+    download_blob()

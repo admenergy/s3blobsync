@@ -3,7 +3,7 @@ import os
 import boto3
 from tqdm import tqdm
 import time
-from lib.common import *
+from .common import *
 
 def assume_role(arn, external_id, access_key, secret_key):
     sts_client = boto3.client(

@@ -2,3 +2,7 @@
 __pycache__/
 downloads/
 inventory/
+build/
+dist/
+s3blobsync.egg-info/
+venv/

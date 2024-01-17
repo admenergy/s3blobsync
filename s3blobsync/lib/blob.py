@@ -8,7 +8,7 @@ from azure.storage.blob import BlobBlock
 import base64
 import uuid
 from tqdm import tqdm
-from lib.common import *
+from .common import *
 
 # Azure Upload to Blob Storage
 def upload_to_azure(blob_service_client, container_name, blob_name, data, block_id):

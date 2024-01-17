@@ -1,9 +1,9 @@
-from lib.s3 import *
-from lib.blob import *
+from .lib.s3 import *
+from .lib.blob import *
 from dotenv import load_dotenv
 load_dotenv()  # This loads the variables from .env into the environment
 
-def main():
+def s3blobsync():
     # Assume the role
     aws_credentials = assume_role(os.getenv('ROLE_ARN_TO_ASSUME'), os.getenv('EXTERNAL_ID'), os.getenv('AWS_ACCESS_KEY'), os.getenv('AWS_SECRET_KEY'))
 
@@ -21,4 +21,4 @@ def main():
                          os.getenv('S3_BUCKET'), os.getenv('AZURE_CONTAINER_NAME'))
 
 if __name__ == "__main__":
-    main()
+    s3blobsync()
