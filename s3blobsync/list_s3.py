@@ -1,6 +1,6 @@
 import csv
 import os
-from .lib.s3 import *
+from lib.s3 import *
 from dotenv import load_dotenv
 
 def list_s3():

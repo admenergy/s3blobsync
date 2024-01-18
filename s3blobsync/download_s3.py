@@ -1,8 +1,8 @@
 import argparse
 import csv
 import os
-from .lib.common import *
-from .lib.s3 import *
+from lib.common import *
+from lib.s3 import *
 from dotenv import load_dotenv
 
 def parse_args():
