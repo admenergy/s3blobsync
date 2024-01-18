@@ -1,5 +1,5 @@
-from lib.s3 import *
-from lib.blob import *
+from .lib.s3 import *
+from .lib.blob import *
 from dotenv import load_dotenv
 load_dotenv()  # This loads the variables from .env into the environment
 

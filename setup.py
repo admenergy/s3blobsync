@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='s3blobsync',
-    version='0.3',
+    version='0.4',
     author='Ala Arab',
     author_email='ala.arab@admenergy.com',
     description='Provides a seamless way to operate between AWS S3 and Azure Blob Storage', 
