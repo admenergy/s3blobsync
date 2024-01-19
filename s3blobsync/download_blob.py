@@ -1,6 +1,7 @@
 import argparse
 import csv
 import os
+from pathlib import Path
 from .lib.common import *
 from .lib.blob import *
 from dotenv import load_dotenv
@@ -8,6 +9,7 @@ from dotenv import load_dotenv
 def parse_args():
     parser = argparse.ArgumentParser(description='Blob Sync Script')
     parser.add_argument('--patterns', nargs='*', help='List of filename patterns to match')
+    parser.add_argument('--env-file', type=str, default='.env', help='Path to the .env file')
     return parser.parse_args()
 
 def download_blob():
@@ -15,7 +17,13 @@ def download_blob():
     args = parse_args()
 
     # Load environment variables
-    load_dotenv()
+    # Check if the .env file exists at the specified path
+    env_path = Path(args.env_file)
+    if env_path.is_file():
+        # Load environment variables from the specified .env file
+        load_dotenv(dotenv_path=env_path)
+    else:
+        print(f"Warning: '.env' file not found at {env_path}.")
 
     # Determine valid_patterns
     if args.patterns is not None:

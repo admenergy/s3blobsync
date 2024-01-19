@@ -1,5 +1,3 @@
-# lib/__init__.py content
-
 # Import all functions from blob.py
 from .blob import (
     upload_to_azure,
