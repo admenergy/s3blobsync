@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='s3blobsync',
-    version='0.4',
+    version='0.5',
     author='Ala Arab',
     author_email='ala.arab@admenergy.com',
     description='Provides a seamless way to operate between AWS S3 and Azure Blob Storage', 
@@ -21,5 +21,13 @@ setup(
         'License :: OSI Approved :: MIT License',  # Update the license as appropriate
         'Operating System :: OS Independent',
     ],
+    entry_points={
+        "console_scripts": [
+            "s3blobsync = s3blobsync.s3blobsync:s3blobsync",
+            "download_s3 = s3blobsync.download_s3:download_s3",
+            "download_blob = s3blobsync.download_blob:download_blob",
+            "list_s3 = s3blobsync.list_s3:list_s3",
+        ]
+    },
     python_requires='>=3.10',  # Minimum version requirement of the Python for your project
 )

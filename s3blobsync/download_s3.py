@@ -20,7 +20,7 @@ def download_s3():
     env_path = Path(args.env_file)
     if env_path.is_file():
         # Load environment variables from the specified .env file
-        load_dotenv(dotenv_path=env_path)
+        load_dotenv(dotenv_path=env_path, override=True)
     else:
         print(f"Warning: '.env' file not found at {env_path}.")
 
