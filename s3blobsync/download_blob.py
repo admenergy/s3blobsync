@@ -12,23 +12,17 @@ def parse_args():
     parser.add_argument('--env-file', type=str, default='.env', help='Path to the .env file')
     return parser.parse_args()
 
-def download_blob():
-    # Parse command line arguments
-    args = parse_args()
-
+def download_blob(patterns=None, env_file='.env'):
     # Load environment variables
-    # Check if the .env file exists at the specified path
-    env_path = Path(args.env_file)
+    env_path = Path(env_file)
     if env_path.is_file():
-        # Load environment variables from the specified .env file
         load_dotenv(dotenv_path=env_path, override=True)
     else:
         print(f"Warning: '.env' file not found at {env_path}.")
 
     # Determine valid_patterns
-    if args.patterns is not None:
-        valid_patterns = args.patterns
-    else:
+    valid_patterns = patterns
+    if valid_patterns is None:
         valid_patterns_env = os.getenv('VALID_PATTERNS')
         valid_patterns = valid_patterns_env.split(',') if valid_patterns_env else None
 
@@ -66,5 +60,9 @@ def download_blob():
             # Download the object
             download_from_azure(blob_service_client, os.getenv('AZURE_CONTAINER_NAME'), blob_name, download_path, valid_patterns=valid_patterns)
 
+def main():
+    args = parse_args()
+    download_blob(patterns=args.patterns, env_file=args.env_file)
+
 if __name__ == "__main__":
-    download_blob()
+    main()

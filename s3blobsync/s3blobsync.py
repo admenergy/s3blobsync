@@ -9,15 +9,9 @@ def parse_args():
     parser.add_argument('--env-file', type=str, default='.env', help='Path to the .env file')
     return parser.parse_args()
 
-def s3blobsync():
-    # Parse command line arguments
-    args = parse_args()
-    
-    # Load environment variables
-    # Check if the .env file exists at the specified path
-    env_path = Path(args.env_file)
+def s3blobsync(env_file='.env'):
+    env_path = Path(env_file)
     if env_path.is_file():
-        # Load environment variables from the specified .env file
         load_dotenv(dotenv_path=env_path, override=True)
         print(f"Loaded environment variables from {env_path}.")
     else:
@@ -39,5 +33,10 @@ def s3blobsync():
     transfer_s3_to_azure(s3_client, blob_service_client,
                          os.getenv('S3_BUCKET'), os.getenv('AZURE_CONTAINER_NAME'))
 
+def main():
+    args = parse_args()
+    s3blobsync(env_file=args.env_file)
+
 if __name__ == "__main__":
-    s3blobsync()
+    # Parse command line arguments
+    main()

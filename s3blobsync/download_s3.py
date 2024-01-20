@@ -12,27 +12,23 @@ def parse_args():
     parser.add_argument('--env-file', type=str, default='.env', help='Path to the .env file')
     return parser.parse_args()
  
-def download_s3():
-    # Parse command line arguments
-    args = parse_args()
-
-    # Check if the .env file exists at the specified path
-    env_path = Path(args.env_file)
+def download_s3(patterns=None, env_file='.env'):
+    # Load environment variables
+    env_path = Path(env_file)
     if env_path.is_file():
-        # Load environment variables from the specified .env file
         load_dotenv(dotenv_path=env_path, override=True)
     else:
         print(f"Warning: '.env' file not found at {env_path}.")
 
     # Determine valid_patterns
-    if args.patterns is not None:
-        valid_patterns = args.patterns
-    else:
+    valid_patterns = patterns
+    if valid_patterns is None:
         valid_patterns_env = os.getenv('VALID_PATTERNS')
         valid_patterns = valid_patterns_env.split(',') if valid_patterns_env else None
 
     # Assume the role
-    aws_credentials = assume_role(os.getenv('ROLE_ARN_TO_ASSUME'), os.getenv('EXTERNAL_ID'), os.getenv('AWS_ACCESS_KEY'), os.getenv('AWS_SECRET_KEY'))
+    aws_credentials = assume_role(os.getenv('ROLE_ARN_TO_ASSUME'), os.getenv('EXTERNAL_ID'), 
+                                  os.getenv('AWS_ACCESS_KEY'), os.getenv('AWS_SECRET_KEY'))
 
     # Get the S3 client
     s3_client = get_s3_client(aws_credentials)
@@ -61,5 +57,9 @@ def download_s3():
             # Download the object
             download_from_s3(s3_client, os.getenv('S3_BUCKET'), key, download_path, valid_patterns=valid_patterns)
 
+def main():
+    args = parse_args()
+    download_from_s3(patterns=args.patterns, env_file=args.env_file)
+
 if __name__ == "__main__":
-    download_s3()
+    main()
