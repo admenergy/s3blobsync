@@ -20,12 +20,12 @@ To set up S3BlobSync, you need to configure your AWS and Azure credentials. Use 
 
 2. **Download from AWS S3**
    ```bash
-   python3 download_from_s3.py
+   python3 download_s3.py
    ```
 
 3. **Download from Azure**
    ```bash
-   python3 download_from_azure.py
+   python3 download_blob.py
    ```
 
 ## Advanced Usage
