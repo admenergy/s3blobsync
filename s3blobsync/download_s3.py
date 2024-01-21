@@ -59,7 +59,7 @@ def download_s3(patterns=None, env_file='.env'):
 
 def main():
     args = parse_args()
-    download_from_s3(patterns=args.patterns, env_file=args.env_file)
+    download_s3(patterns=args.patterns, env_file=args.env_file)
 
 if __name__ == "__main__":
     main()
