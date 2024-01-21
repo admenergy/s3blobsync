@@ -24,9 +24,9 @@ Create a `.env` file for AWS and Azure credentials, referencing `.env.example`.
 Post-installation, the following command-line tools are available:
 
 - **Sync Data**: `s3blobsync`
+- **List S3 Bucket Contents**: `list_s3`
 - **Download from AWS S3**: `download_s3`
 - **Download from Azure Blob Storage**: `download_blob`
-- **List S3 Bucket Contents**: `list_s3`
 
 Usage examples:
 
