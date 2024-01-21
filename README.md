@@ -60,21 +60,21 @@ s3blobsync(env_file='path_to_your_env_file')
 ### Downloading Data from AWS S3
 
 ```python
-from download_s3 import download_s3
+from s3blobsync import download_s3
 download_s3(patterns=['foo*.gz', 'bar*.gz'], env_file='path_to_your_env_file')
 ```
 
 ### Downloading Data from Azure Blob Storage
 
 ```python
-from download_blob import download_blob
+from s3blobsync import download_blob
 download_blob(patterns=['foo*.gz', 'bar*.gz'], env_file='path_to_your_env_file')
 ```
 
 ### Listing Contents of S3 Bucket
 
 ```python
-from list_s3 import list_s3
+from s3blobsync import list_s3
 list_s3(env_file='path_to_your_env_file')
 ```
 
@@ -84,9 +84,9 @@ For a more manual approach, clone the GitHub repository and install the dependen
 
 ```bash
 python3 -m s3blobsync.s3blobsync --env-file <path_to_env_file>
-python3 -m download_s3.download_s3 --patterns 'foo*.gz,bar*.gz' --env-file <path_to_env_file>
-python3 -m download_blob.download_blob --patterns 'foo*.gz,bar*.gz' --env-file <path_to_env_file>
-python3 -m list_s3.list_s3 --env-file <path_to_env_file>
+python3 -m s3blobsync.download_s3 --patterns 'foo*.gz,bar*.gz' --env-file <path_to_env_file>
+python3 -m s3blobsync.download_blob --patterns 'foo*.gz,bar*.gz' --env-file <path_to_env_file>
+python3 -m s3blobsync.list_s3 --env-file <path_to_env_file>
 ```
 
 ## Advanced Usage
