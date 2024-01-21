@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 def parse_args():
     parser = argparse.ArgumentParser(description='Blob Sync Script')
     parser.add_argument('--patterns', nargs='*', help='List of filename patterns to match')
-    parser.add_argument('--env-file', type=str, default='.env', help='Path to the .env file')
+    parser.add_argument('--env_file', type=str, default='.env', help='Path to the .env file')
     return parser.parse_args()
 
 def download_blob(patterns=None, env_file='.env'):

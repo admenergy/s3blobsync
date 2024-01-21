@@ -9,10 +9,14 @@ from pathlib import Path
 def parse_args():
     parser = argparse.ArgumentParser(description='S3 Sync Script')
     parser.add_argument('--patterns', nargs='*', help='List of filename patterns to match')
-    parser.add_argument('--env-file', type=str, default='.env', help='Path to the .env file')
+    parser.add_argument('--env_file', type=str, default='.env', help='Path to the .env file')
     return parser.parse_args()
  
 def download_s3(patterns=None, env_file='.env'):
+
+    # display env_file path
+    print(f"env_file: {env_file}")
+
     # Load environment variables
     env_path = Path(env_file)
     if env_path.is_file():

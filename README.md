@@ -31,10 +31,10 @@ Post-installation, the following command-line tools are available:
 Usage examples:
 
 ```bash
-s3blobsync --env-file <path_to_env_file>
-list_s3 --env-file <path_to_env_file>
-download_s3 --patterns 'foo*.gz,bar*.gz' --env-file <path_to_env_file>
-download_blob --patterns 'foo*.gz,bar*.gz' --env-file <path_to_env_file>
+s3blobsync --env_file <path_to_env_file>
+list_s3 --env_file <path_to_env_file>
+download_s3 --patterns 'foo*.gz,bar*.gz' --env_file <path_to_env_file>
+download_blob --patterns 'foo*.gz,bar*.gz' --env_file <path_to_env_file>
 ```
 
 ## Dependencies
@@ -83,16 +83,16 @@ list_s3(env_file='path_to_your_env_file')
 For a more manual approach, clone the GitHub repository and install the dependencies. When running scripts directly, use the module execution method to avoid relative import issues:
 
 ```bash
-python3 -m s3blobsync.s3blobsync --env-file <path_to_env_file>
-python3 -m s3blobsync.download_s3 --patterns 'foo*.gz,bar*.gz' --env-file <path_to_env_file>
-python3 -m s3blobsync.download_blob --patterns 'foo*.gz,bar*.gz' --env-file <path_to_env_file>
-python3 -m s3blobsync.list_s3 --env-file <path_to_env_file>
+python3 -m s3blobsync.s3blobsync --env_file <path_to_env_file>
+python3 -m s3blobsync.download_s3 --patterns 'foo*.gz,bar*.gz' --env_file <path_to_env_file>
+python3 -m s3blobsync.download_blob --patterns 'foo*.gz,bar*.gz' --env_file <path_to_env_file>
+python3 -m s3blobsync.list_s3 --env_file <path_to_env_file>
 ```
 
 ## Advanced Usage
 
 - **Pattern Filtering**: Apply `--patterns` for file name filtering (comma-separated).
-- **Custom Environment File**: Use `--env-file` to specify a custom `.env` file (defaults to '.env').
+- **Custom Environment File**: Use `--env_file` to specify a custom `.env` file (defaults to '.env').
 
 ## Contributing
 
