@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='s3blobsync',
-    version='1.2',
+    version='1.3',
     author='Ala Arab',
     author_email='ala.arab@admenergy.com',
     description='Provides a seamless way to operate between AWS S3 and Azure Blob Storage', 
@@ -23,10 +23,10 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "s3blobsync = s3blobsync.s3blobsync:s3blobsync",
-            "download_s3 = s3blobsync.download_s3:download_s3",
-            "download_blob = s3blobsync.download_blob:download_blob",
-            "list_s3 = s3blobsync.list_s3:list_s3",
+            "s3blobsync = s3blobsync.s3blobsync:main",
+            "download_s3 = s3blobsync.download_s3:main",
+            "download_blob = s3blobsync.download_blob:main",
+            "list_s3 = s3blobsync.list_s3:main",
         ]
     },
     python_requires='>=3.10',  # Minimum version requirement of the Python for your project
